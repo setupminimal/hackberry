@@ -4,21 +4,19 @@ set -ouex pipefail
 
 ### Install packages
 
-# Packages can be installed from any enabled yum repo on the image.
-# RPMfusion repos are available by default in ublue main images
-# List of rpmfusion packages can be found here:
-# https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
+dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++\
+    gnome-boxes rustup virtualenv flex bison ruby rust rust-src bindgen-cli\
+    rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig npm idris julia\
+    fd-find zig racket sbcl black python3-isort python3-pytest shellcheck shfmt\
+    clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses ncurses-compat-libs\
+    xz perl pkg-config tidy rbenv \
+    postgresql postgresql-server postgresql-contrib libpq-devel python3-bcrypt\
+    aspell ImageMagick httpd mod_http2
 
-# this installs a package from fedora repos
-dnf5 install -y tmux 
-
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
-
-#### Example for enabling a System Unit File
-
-systemctl enable podman.socket
+wget https://builds.zigtools.org/zls-linux-x86_64-0.13.0.tar.xz
+sha512sum --check --status <<EOF
+21541d5f0e77b840aaa5ffb834bc0feaf72df86902af62682f4023f6a77c4653177900ceb122e7363954a40935ab435984a1ff7fa2219602576d4db7f6d65b1b  zls-linux-x86_64-0.13.0.tar.xz
+EOF
+# If the check fails, then --status should mean the script fails too.
+tar xvf zls*
+sudo mv zls /usr/bin
