@@ -19,4 +19,4 @@ sha512sum --check --status <<EOF
 EOF
 # If the check fails, then --status should mean the script fails too.
 tar xvf zls*
-sudo mv zls /usr/bin
+mv zls /usr/bin
