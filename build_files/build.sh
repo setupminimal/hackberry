@@ -20,3 +20,14 @@ EOF
 # If the check fails, then --status should mean the script fails too.
 tar xvf zls*
 mv zls /usr/bin
+
+
+### Install direnv by default
+
+echo 'eval $\(direnv hook bash\)' >> /etc/bashrc
+
+
+### Put back the fedora themeing
+
+
+dnf -y swap aurora-logos fedora-logos
