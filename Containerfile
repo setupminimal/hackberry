@@ -14,6 +14,13 @@ FROM ghcr.io/ublue-os/aurora-dx:latest
 # Fedora base image: quay.io/fedora/fedora-bootc:41
 # CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
 
+# TODO figure out how to selectively inherit these from aurora
+ARG IMAGE_NAME="hackberry"
+ARG IMAGE_VENDOR="setupminimal"
+ARG UBLUE_IMAGE_TAG="latest"
+ARG BASE_IMAGE_NAME="kinoite"
+ARG FEDORA_MAJOR_VERSION="42"
+
 ### MODIFICATIONS
 ## the following RUN directive does all the things required to run "build.sh" as recommended.
 
