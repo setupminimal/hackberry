@@ -9,7 +9,7 @@ dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++\
     rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig npm idris julia\
     fd-find zig racket sbcl black python3-isort python3-pytest shellcheck shfmt\
     clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses ncurses-compat-libs\
-    xz perl pkg-config tidy rbenv firefox \
+    xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
     postgresql postgresql-server postgresql-contrib libpq-devel python3-bcrypt\
     aspell ImageMagick httpd mod_http2
 
