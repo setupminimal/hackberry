@@ -51,7 +51,7 @@ echo "IMAGE_VERSION=\"${VERSION}\"" >> /usr/lib/os-releae
 
 ### Install packages
 
-true || dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++\
+dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++\
     gnome-boxes rustup virtualenv flex bison ruby rust rust-src bindgen-cli\
     rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig npm idris julia\
     fd-find zig racket sbcl black python3-isort python3-pytest shellcheck shfmt\
