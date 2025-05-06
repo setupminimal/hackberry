@@ -86,20 +86,19 @@ mkdir /usr/share/python-global
 export PIP_PREFIX=/usr/share/python-global
 pip install pyflakes pipenv nose
 
-echo "export PAHT=/usr/share/python-global/bin:\$PATH" >> /etc/bashrc
+echo "export PATH=/usr/share/python-global/bin:\$PATH" >> /etc/bashrc
 
-rm -rf /var/roothome/*
+rm -rf /var/roothome/* /var/roothome/.*
 
-### Install direnv by default
-
-echo 'eval $\(direnv hook bash\)' >> /etc/bashrc
+mkdir /var/roothome/.gnupg
 
 
 ### Put back the fedora themeing
 
 
+dnf -y remove aurora-plymouth
 dnf -y swap aurora-logos fedora-logos
-
+dnf -y install plymouth
 
 
 ### Install per-user setup
