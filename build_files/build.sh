@@ -41,26 +41,20 @@ sed -i "s|^VERSION=.*|VERSION=\"${VERSION} (${BASE_IMAGE_NAME^})\"|" /usr/lib/os
 sed -i "s|^OSTREE_VERSION=.*|OSTREE_VERSION=\'${VERSION}\'|" /usr/lib/os-release
 
 if [[ -n "${SHA_HEAD_SHORT:-}" ]]; then
-echo "BUILD_ID=\"$SHA_HEAD_SHORT\"" >>/usr/lib/os-release
+	echo "BUILD_ID=\"$SHA_HEAD_SHORT\"" >>/usr/lib/os-release
 fi
 
 # Added in systemd 249.
 # https://www.freedesktop.org/software/systemd/man/latest/os-release.html#IMAGE_ID=
-echo "IMAGE_ID=\"${IMAGE_NAME}\"" >> /usr/lib/os-release
-echo "IMAGE_VERSION=\"${VERSION}\"" >> /usr/lib/os-releae
+echo "IMAGE_ID=\"${IMAGE_NAME}\"" >>/usr/lib/os-release
+echo "IMAGE_VERSION=\"${VERSION}\"" >>/usr/lib/os-releae
 
 ### Install packages
 
-dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++\
-    gnome-boxes rustup virtualenv flex bison ruby rust rust-src bindgen-cli\
-    rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig npm idris julia\
-    fd-find zig racket sbcl black python3-isort python3-pytest shellcheck shfmt\
-    clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses ncurses-compat-libs\
-    xz perl pkg-config tidy rbenv firefox claws-mail btrbk aspell ImageMagick
+dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++ gnome-boxes rustup virtualenv flex bison ruby rust rust-src bindgen-cli rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig npm idris julia fd-find zig racket sbcl black python3-isort python3-pytest shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk aspell ImageMagick
 
 #     postgresql postgresql-server postgresql-contrib libpq-devel python3-bcrypt\
 #     aspell ImageMagick httpd mod_http2
-
 
 wget https://builds.zigtools.org/zls-linux-x86_64-0.13.0.tar.xz
 sha512sum --check --status <<EOF
@@ -79,31 +73,27 @@ mkdir /usr/share/npm-global
 export NPM_CONFIG_PREFIX=/usr/share/npm-global
 npm install -g stylelint js-beautify --loglevel=verbose
 
-echo "export PATH=/usr/share/npm-global/bin:\$PATH" >> /etc/bashrc
-
+echo "export PATH=/usr/share/npm-global/bin:\$PATH" >>/etc/bashrc
 
 mkdir /usr/share/python-global
 export PIP_PREFIX=/usr/share/python-global
 pip install pyflakes pipenv nose
 
-echo "export PATH=/usr/share/python-global/bin:\$PATH" >> /etc/bashrc
+echo "export PATH=/usr/share/python-global/bin:\$PATH" >>/etc/bashrc
 
 rm -rf /var/roothome/* /var/roothome/.*
 
 mkdir /var/roothome/.gnupg
 
-
 ### Put back the fedora themeing
-
 
 dnf -y remove aurora-plymouth
 dnf -y swap aurora-logos fedora-logos
 dnf -y install plymouth
 
-
 ### Install per-user setup
 
-cat > /usr/lib/systemd/system/bootstrap-user@.service <<EOF
+cat >/usr/lib/systemd/system/bootstrap-user@.service <<EOF
 [Unit]
 Description=Bootstrap per-user setup for user %i
 After=user@%i.service
@@ -121,7 +111,7 @@ RestartSec=5
 WantedBy=default.target
 EOF
 
-cat > /usr/bin/bootstrap-user <<EOF
+cat >/usr/bin/bootstrap-user <<EOF
 #!/bin/bash
 
 user="\$1"
@@ -148,7 +138,7 @@ EOF
 
 chmod +x /usr/bin/bootstrap-user
 
-cat > /usr/lib/systemd/system/bootstrap-users.service <<EOF
+cat >/usr/lib/systemd/system/bootstrap-users.service <<EOF
 [Unit]
 Description=Bootstrap all users
 After=syslog.target
@@ -162,7 +152,7 @@ ExecStart=/usr/bin/bootstrap-all-users
 WantedBy=multi-user.target
 EOF
 
-cat > /usr/bin/bootstrap-all-users <<EOF
+cat >/usr/bin/bootstrap-all-users <<EOF
 #!/bin/bash
 
 # Get a list of users (excluding system users - UID < 1000)
