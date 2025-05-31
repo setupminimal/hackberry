@@ -107,6 +107,7 @@ cat > /usr/lib/systemd/system/bootstrap-user@.service <<EOF
 [Unit]
 Description=Bootstrap per-user setup for user %i
 After=user@%i.service
+# TODO ensure it runs after the network
 
 [Service]
 Type=simple
@@ -165,12 +166,14 @@ cat > /usr/bin/bootstrap-all-users <<EOF
 #!/bin/bash
 
 # Get a list of users (excluding system users - UID < 1000)
-users=$\(getent passwd | awk -F: '\$3 >= 1000 {print \$1}')
+users=\$(getent passwd | awk -F: '\$3 >= 1000 {print \$1}')
 
 for user in \$users; do
   echo "Instantiating Haskell bootstrap for user: \$user"
-  systemd --user run --scope bootstrap-user@"\$user".service
+  systemctl --no-block --user run --scope bootstrap-user@"\$user".service
 done
 EOF
 
 chmod +x /usr/bin/bootstrap-all-users
+
+systemctl enable bootstrap-users
