@@ -35,7 +35,11 @@ sed -i "s|^SUPPORT_URL=.*|SUPPORT_URL=\"$SUPPORT_URL\"|" /usr/lib/os-release
 sed -i "s|^BUG_REPORT_URL=.*|BUG_REPORT_URL=\"$BUG_SUPPORT_URL\"|" /usr/lib/os-release
 sed -i "s|^CPE_NAME=\"cpe:/o:fedoraproject:fedora|CPE_NAME=\"cpe:/o:universal-blue:${IMAGE_PRETTY_NAME,}|" /usr/lib/os-release
 sed -i "s|^DEFAULT_HOSTNAME=.*|DEFAULT_HOSTNAME=\"${IMAGE_PRETTY_NAME,}\"|" /usr/lib/os-release
-sed -i "s|^ID=.*|ID=${IMAGE_PRETTY_NAME,}|" /usr/lib/os-release
+# Unfortunately, if we set a name here, bootc-image-builder doesn't know how to
+# handle it. This can be reinstated when
+# https://github.com/osbuild/bootc-image-builder/issues/816 is fixed.
+#sed -i "s|^ID=.*|ID=${IMAGE_PRETTY_NAME,}|" /usr/lib/os-release
+sed -i "s|^ID=.*|ID=fedora|" /usr/lib/os-release
 sed -i "/^REDHAT_BUGZILLA_PRODUCT=/d; /^REDHAT_BUGZILLA_PRODUCT_VERSION=/d; /^REDHAT_SUPPORT_PRODUCT=/d; /^REDHAT_SUPPORT_PRODUCT_VERSION=/d" /usr/lib/os-release
 sed -i "s|^VERSION=.*|VERSION=\"${VERSION} (${BASE_IMAGE_NAME^})\"|" /usr/lib/os-release
 sed -i "s|^OSTREE_VERSION=.*|OSTREE_VERSION=\'${VERSION}\'|" /usr/lib/os-release
@@ -47,43 +51,14 @@ fi
 # Added in systemd 249.
 # https://www.freedesktop.org/software/systemd/man/latest/os-release.html#IMAGE_ID=
 echo "IMAGE_ID=\"${IMAGE_NAME}\"" >>/usr/lib/os-release
-echo "IMAGE_VERSION=\"${VERSION}\"" >>/usr/lib/os-releae
+echo "IMAGE_VERSION=\"${VERSION}\"" >>/usr/lib/os-release
 
-### Install packages
 
-dnf install -y feh mpv strace python3-devel htop calibre evince clang emacs g++ gnome-boxes rustup virtualenv flex bison ruby rust rust-src bindgen-cli rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig npm idris julia fd-find zig racket sbcl black python3-isort python3-pytest shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk aspell ImageMagick
-
-#     postgresql postgresql-server postgresql-contrib libpq-devel python3-bcrypt\
-#     aspell ImageMagick httpd mod_http2
-
-wget https://builds.zigtools.org/zls-linux-x86_64-0.13.0.tar.xz
-sha512sum --check --status <<EOF
-21541d5f0e77b840aaa5ffb834bc0feaf72df86902af62682f4023f6a77c4653177900ceb122e7363954a40935ab435984a1ff7fa2219602576d4db7f6d65b1b  zls-linux-x86_64-0.13.0.tar.xz
+# Set console settings
+cat >/etc/vconsole.conf <<EOF
+KEYMAP="us-dvorak"
 EOF
-# If the check fails, then --status should mean the script fails too.
-tar xvf zls*
-mv zls /usr/bin
 
-dnf install -y npm
-
-# npm tries to put logs here and gets cranky if it can't.
-mkdir /var/roothome/
-
-mkdir /usr/share/npm-global
-export NPM_CONFIG_PREFIX=/usr/share/npm-global
-npm install -g stylelint js-beautify --loglevel=verbose
-
-echo "export PATH=/usr/share/npm-global/bin:\$PATH" >>/etc/bashrc
-
-mkdir /usr/share/python-global
-export PIP_PREFIX=/usr/share/python-global
-pip install pyflakes pipenv nose
-
-echo "export PATH=/usr/share/python-global/bin:\$PATH" >>/etc/bashrc
-
-rm -rf /var/roothome/* /var/roothome/.*
-
-mkdir /var/roothome/.gnupg
 
 ### Put back the fedora themeing
 
