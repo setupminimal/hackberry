@@ -90,6 +90,11 @@ build $target_image=image_name $tag=default_tag:
         BUILD_ARGS+=("--build-arg" "SHA_HEAD_SHORT=$(git rev-parse --short HEAD)")
     fi
 
+    # Otherwise we'll get an error about not being able to overwrite it.
+    if [ -d output ]; then
+        rm -rf output
+    fi
+
     podman build \
         "${BUILD_ARGS[@]}" \
         --pull=newer \

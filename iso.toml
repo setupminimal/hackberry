@@ -1,19 +1,23 @@
 [customizations.installer.kickstart]
 contents = """
+lang en_US.UTF-8
+keyboard --vckeymap=us-dvorak --xlayouts=dvorak
+timezone America/New_York
+
+user --name testuser --password test --plaintext --groups wheel
+rootpw --lock
+
+zerombr
+clearpart --all --initlabel
+autopart --type=btrfs
+reboot --eject
+
 %post
 bootc switch --mutate-in-place --transport registry ghcr.io/setupminimal/hackberry:latest
+
+systemctl preset-all
+systemctl preset-all --user
+sudo -u testuser systemctl preset-all --user
 %end
 """
 
-[customizations.installer.modules]
-enable = [
-  "org.fedoraproject.Anaconda.Modules.Storage"
-]
-disable = [
-  "org.fedoraproject.Anaconda.Modules.Network",
-  "org.fedoraproject.Anaconda.Modules.Security",
-  "org.fedoraproject.Anaconda.Modules.Services",
-  "org.fedoraproject.Anaconda.Modules.Users",
-  "org.fedoraproject.Anaconda.Modules.Subscription",
-  "org.fedoraproject.Anaconda.Modules.Timezone" 
-]

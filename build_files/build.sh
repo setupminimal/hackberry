@@ -14,17 +14,17 @@ VERSION="${VERSION:-00.00000000}"
 IMAGE_INFO="/usr/share/ublue-os/image-info.json"
 IMAGE_REF="ostree-image-signed:docker://ghcr.io/$IMAGE_VENDOR/$IMAGE_NAME"
 
-cat >$IMAGE_INFO <<EOF
-{
-  "image-name": "$IMAGE_NAME",
-  "image-flavor": "plain",
-  "image-vendor": "$IMAGE_VENDOR",
-  "image-ref": "$IMAGE_REF",
-  "image-tag":"$UBLUE_IMAGE_TAG",
-  "base-image-name": "$BASE_IMAGE_NAME",
-  "fedora-version": "$FEDORA_MAJOR_VERSION"
-}
-EOF
+#cat >$IMAGE_INFO <<EOF
+#{
+#  "image-name": "$IMAGE_NAME",
+#  "image-flavor": "plain",
+#  "image-vendor": "$IMAGE_VENDOR",
+#  "image-ref": "$IMAGE_REF",
+#  "image-tag":"$UBLUE_IMAGE_TAG",
+#  "base-image-name": "$BASE_IMAGE_NAME",
+#  "fedora-version": "$FEDORA_MAJOR_VERSION"
+#}
+#EOF
 
 # OS Release File
 sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=\"${IMAGE_PRETTY_NAME} (Version: ${VERSION} / FROM Fedora ${BASE_IMAGE_NAME^} $FEDORA_MAJOR_VERSION)\"|" /usr/lib/os-release
@@ -54,91 +54,108 @@ echo "IMAGE_ID=\"${IMAGE_NAME}\"" >>/usr/lib/os-release
 echo "IMAGE_VERSION=\"${VERSION}\"" >>/usr/lib/os-release
 
 
+
+### Install packages
+
+
+# Report on leaf packages
+dnf leaves > /usr/share/leaf-packages
+
+wget https://builds.zigtools.org/zls-linux-x86_64-0.13.0.tar.xz
+sha512sum --check --status <<EOF
+21541d5f0e77b840aaa5ffb834bc0feaf72df86902af62682f4023f6a77c4653177900ceb122e7363954a40935ab435984a1ff7fa2219602576d4db7f6d65b1b  zls-linux-x86_64-0.13.0.tar.xz
+EOF
+# If the check fails, then --status should mean the script fails too.
+tar xvf zls*
+mv zls /usr/bin
+
+# npm tries to put logs here and gets cranky if it can't.
+mkdir -p /var/roothome/
+
+mkdir /usr/share/npm-global
+export NPM_CONFIG_PREFIX=/usr/share/npm-global
+npm install -g stylelint js-beautify --loglevel=verbose
+
+echo "export PATH=/usr/share/npm-global/bin:\$PATH" >>/etc/bashrc
+
+mkdir /usr/share/python-global
+export PIP_PREFIX=/usr/share/python-global
+pip install pyflakes pipenv nose
+
+echo "export PATH=/usr/share/python-global/bin:\$PATH" >>/etc/bashrc
+
+rm -rf /var/roothome/* /var/roothome/.*
+
+mkdir -p /var/roothome/.gnupg
+
+
+
+
+
 # Set console settings
-cat >/etc/vconsole.conf <<EOF
-KEYMAP="us-dvorak"
+systemd-firstboot --force --keymap 'us-dvorak'
+
+cat > /etc/vconsole.conf <<EOF
+KEYMAP=us-dvorak
+XKBLAYOUT=us
+XKBMODEL=dvorak
+EOF
+
+mkdir -p /etc/X11/xorg.conf.d/
+cat > /etc/X11/xorg.conf.d/00-keyboard.conf <<EOF
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "us"
+        Option "XkbModel" "pc105"
+        Option "XkbVariant" "dvorak"
+EndSection
+EOF
+
+mkdir -p /etc/skel/.config/
+cat > /etc/skel/.config/kxkbrc <<EOF
+[Layout]
+LayoutList=us
+Use=true
+VariantList=dvorak
+Options=compose:caps
+ResetOldOptions=true
 EOF
 
 
-### Put back the fedora themeing
+ln -s ../usr/share/zoneinfo/America/New_York /etc/localtime
 
-dnf -y remove aurora-plymouth
-dnf -y swap aurora-logos fedora-logos
-dnf -y install plymouth
 
 ### Install per-user setup
 
-cat >/usr/lib/systemd/system/bootstrap-user@.service <<EOF
+cat >/usr/lib/systemd/user/bootstrap-user.service <<EOF
 [Unit]
-Description=Bootstrap per-user setup for user %i
-After=user@%i.service
-# TODO ensure it runs after the network
+Description=Bootstrap per-user setup for user
+ConditionUser=!@system
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 Type=simple
-User=%i
-Group=%i
-ExecStart=/usr/bin/bootstrap-user %i
-Restart=on-failure
-RestartSec=5
+ExecStart=/usr/bin/bootstrap-user
 
 [Install]
 WantedBy=default.target
 EOF
 
-cat >/usr/bin/bootstrap-user <<EOF
-#!/bin/bash
-
-user="\$1"
-
-if [ -z "\$user" ]; then
-  echo "Usage: \$0 <username>"
-  exit 1
-fi
-
-if ! id -u "\$user" > /dev/null 2>&1; then
-  echo "User \$user doesn't exist"
-  exit 1
-fi
-
-export BOOTSTRAP_HASKELL_NONINTERACTIVE=1
-export BOOTSTRAP_HASKELL_INSTALL_HLS=1
-
-echo "Installing haskell ..."
-# TODO verify GPG signature
-curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
-stack install hoogle
-echo "Haskell installed for user \$user"
+cat >>/usr/lib/systemd/user-preset/50-hackberry.preset <<EOF
+enable bootstrap-user.service
 EOF
 
+cp /ctx/bootstrap_user.sh /usr/bin/bootstrap-user
 chmod +x /usr/bin/bootstrap-user
 
-cat >/usr/lib/systemd/system/bootstrap-users.service <<EOF
-[Unit]
-Description=Bootstrap all users
-After=syslog.target
-Before=multi-user.target
+# Now. A horrible, horrible hack.
+# I can't seem to make systemd enable presets properly. So we need to call this
+# once a user logs in for the firstt time to get everything set up. So we put it
+# in the default .bashrc and let the dotfile installation script overwrite it
+# later.
 
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/bootstrap-all-users
-
-[Install]
-WantedBy=multi-user.target
+cat >> /etc/skel/.bashrc <<EOF
+systemctl --user preset bootstrap-user.service
 EOF
-
-cat >/usr/bin/bootstrap-all-users <<EOF
-#!/bin/bash
-
-# Get a list of users (excluding system users - UID < 1000)
-users=\$(getent passwd | awk -F: '\$3 >= 1000 {print \$1}')
-
-for user in \$users; do
-  echo "Instantiating Haskell bootstrap for user: \$user"
-  systemctl --no-block --user run --scope bootstrap-user@"\$user".service
-done
-EOF
-
-chmod +x /usr/bin/bootstrap-all-users
-
-systemctl enable bootstrap-users
