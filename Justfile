@@ -83,9 +83,6 @@ build $target_image=image_name $tag=default_tag:
     BUILD_ARGS+=("--build-arg" "MAJOR_VERSION=${fedora_version}")
     BUILD_ARGS+=("--build-arg" "IMAGE_NAME=${target_image}")
     BUILD_ARGS+=("--build-arg" "IMAGE_VENDOR=${repo_organization}")
-    BUILD_ARGS+=("--build-arg" "ENABLE_DX=1")
-    BUILD_ARGS+=("--build-arg" "ENABLE_HWE=0")
-    BUILD_ARGS+=("--build-arg" "ENABLE_GDX=0")
     if [[ -z "$(git status -s)" ]]; then
         BUILD_ARGS+=("--build-arg" "SHA_HEAD_SHORT=$(git rev-parse --short HEAD)")
     fi
