@@ -25,6 +25,7 @@ chmod +x /tmp/ghcup.sh
 stack install hoogle
 echo "Haskell installed for user $user"
 
+cargo install bacon
 
 pip install --user --upgrade pyflakes pipenv nose
 

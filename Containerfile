@@ -32,7 +32,7 @@ RUN dnf install -y feh mpv strace python3-devel htop calibre evince clang \
     npm idris julia fd-find zig racket sbcl black python3-isort python3-pytest \
     shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses \
     ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
-    aspell ImageMagick dnf-plugins-core wget cmake && dnf -y clean all
+    aspell ImageMagick dnf-plugins-core wget cmake direnv marked && dnf -y clean all
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
