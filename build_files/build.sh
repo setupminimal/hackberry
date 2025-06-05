@@ -74,7 +74,7 @@ sha512sum --check --status <<EOF
 36e0d5500f388262d7dfc4285691f408fba3071d11691a2bd3c62b830a232a04484ec59abcbe81ecd84c21cfa807d8421fae3dd85d26500168130edda550d243  /tmp/starship.sh
 EOF
 chmod +x /tmp/starship.sh
-/tmp/starship.sh --yes
+/tmp/starship.sh -y
 
 # npm tries to put logs here and gets cranky if it can't.
 mkdir -p /var/roothome/
