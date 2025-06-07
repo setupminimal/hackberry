@@ -133,9 +133,13 @@ EOF
 ln -s ../usr/share/zoneinfo/America/New_York /etc/localtime
 
 
+### Systemd optimizations
 
 systemctl disable NetworkManager-wait-online.service
-
+mkdir -p /etc/systemd/journald.conf.d
+cat >/etc/systemd/journald.conf.d/01-limit-size.conf <<EOF
+SystemMaxUse=50M
+EOF
 
 
 ### Install per-user setup
