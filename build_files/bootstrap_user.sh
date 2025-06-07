@@ -23,6 +23,7 @@ chmod +x /tmp/ghcup.sh
 # Get new ghcup environment
 . ~/.ghcup/env
 stack install hoogle
+stack install ghcid
 echo "Haskell installed for user $user"
 
 cargo install bacon

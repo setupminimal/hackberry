@@ -133,6 +133,11 @@ EOF
 ln -s ../usr/share/zoneinfo/America/New_York /etc/localtime
 
 
+
+systemctl disable NetworkManager-wait-online.service
+
+
+
 ### Install per-user setup
 
 cat >/usr/lib/systemd/user/bootstrap-user.service <<EOF
