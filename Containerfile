@@ -33,7 +33,7 @@ RUN dnf -y copr enable tulilirockz/fw-fanctrl && \
     npm idris julia fd-find zig racket sbcl black python3-isort python3-pytest \
     shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses \
     ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
-    aspell ImageMagick dnf-plugins-core wget cmake direnv marked fw-ectool && \
+    aspell ImageMagick dnf-plugins-core wget cmake direnv marked fw-ectool sway && \
     dnf -y clean all
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
