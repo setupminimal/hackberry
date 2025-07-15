@@ -16,7 +16,7 @@ echo "Installing haskell ..."
 # TODO verify GPG signature
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org > /tmp/ghcup.sh
 sha512sum --check --status <<EOF
-7ccdd748d15d0b28fdf4f230be2dcb77d3a6300674e7862bf5b96293cf58bb2aad0894dffb5bd3b5e29fa1cb66adb3a3073b88067e3fc86e9fe06e5b278449f1  /tmp/ghcup.sh
+dd7ae2086567f5b9a684f5f2302f530df6f816d1865c4f867cf26906721fa7d5ccfdd2b28fee66c96cf08ccf6f967e01459b5b10f432e645d19953dd5c5472d3 /tmp/ghcup.sh
 EOF
 chmod +x /tmp/ghcup.sh
 /tmp/ghcup.sh
@@ -29,6 +29,3 @@ echo "Haskell installed for user $user"
 cargo install bacon
 
 pip install --user --upgrade pyflakes pipenv nose
-
-# Once bootstrap has completed successfully, remove it from the .bashrc
-sed -i 's/systemctl --user preset bootstrap-user.service//' ~/.bashrc

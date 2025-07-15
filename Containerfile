@@ -34,7 +34,9 @@ RUN dnf -y copr enable tulilirockz/fw-fanctrl && \
     shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses \
     ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
     aspell ImageMagick dnf-plugins-core wget cmake direnv marked fw-ectool sway \
-    tailscale podman podman-compose && \
+    tailscale podman podman-compose \
+    # For testing in VMs
+    spice-webdavd spice-vdagent && \
     dnf -y clean all
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
@@ -43,7 +45,9 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh && \
     ostree container commit
-    
+
+RUN rm /var/log/dnf5.log* && rm -r /var/cache/*
+
 ### LINTING
 ## Verify final image and contents are correct.
 RUN bootc container lint

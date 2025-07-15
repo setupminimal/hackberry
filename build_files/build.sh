@@ -9,22 +9,7 @@ HOME_URL="https://github.com/setupminimal/hackberry/"
 DOCUMENTATION_URL="https://github.com/setupminimal/hackberry"
 SUPPORT_URL="https://github.com/setupminimal/hackberry/issues"
 BUG_SUPPORT_URL="https://github.com/setupminimal/hackberry/issues"
-VERSION="${VERSION:-00.00000000}"
-
-IMAGE_INFO="/usr/share/ublue-os/image-info.json"
-IMAGE_REF="ostree-image-signed:docker://ghcr.io/$IMAGE_VENDOR/$IMAGE_NAME"
-
-#cat >$IMAGE_INFO <<EOF
-#{
-#  "image-name": "$IMAGE_NAME",
-#  "image-flavor": "plain",
-#  "image-vendor": "$IMAGE_VENDOR",
-#  "image-ref": "$IMAGE_REF",
-#  "image-tag":"$UBLUE_IMAGE_TAG",
-#  "base-image-name": "$BASE_IMAGE_NAME",
-#  "fedora-version": "$FEDORA_MAJOR_VERSION"
-#}
-#EOF
+VERSION="${VERSION:-$(date --rfc-3339=date)}"
 
 # OS Release File
 sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=\"${IMAGE_PRETTY_NAME} (Version: ${VERSION} / FROM Fedora ${BASE_IMAGE_NAME^} $FEDORA_MAJOR_VERSION)\"|" /usr/lib/os-release
@@ -69,6 +54,8 @@ EOF
 tar xvf zls*
 mv zls /usr/bin
 
+rm zls-linux*.tar.xz
+
 curl -sS https://starship.rs/install.sh > /tmp/starship.sh
 sha512sum --check --status <<EOF
 36e0d5500f388262d7dfc4285691f408fba3071d11691a2bd3c62b830a232a04484ec59abcbe81ecd84c21cfa807d8421fae3dd85d26500168130edda550d243  /tmp/starship.sh
@@ -100,14 +87,20 @@ mkdir -p /var/roothome/.gnupg
 
 
 # Set console settings
-systemd-firstboot --force --keymap 'us-dvorak'
+
+#sed -i 's!systemd-firstboot --prompt.*!systemd-firstboot --locale=en_US.UTF-8 --keymap=us-dvorak --timezone=America/New_York --delete-root-password!' /usr/lib/systemd/system/systemd-firstboot.service
 
 cat > /etc/vconsole.conf <<EOF
-KEYMAP=us-dvorak
-XKBLAYOUT=us
-XKBMODEL=dvorak
+KEYMAP="us-dvorak"
 EOF
 
+mkdir /usr/lib/systemd/system/systemd-vconsole-setup.service.d
+cat > /usr/lib/systemd/system/systemd-vconsole-setup.service.d/hackberry.conf <<EOF
+[Unit]
+RequiredBy=default.target
+EOF
+
+# For the login manager, I think?
 mkdir -p /etc/X11/xorg.conf.d/
 cat > /etc/X11/xorg.conf.d/00-keyboard.conf <<EOF
 Section "InputClass"
@@ -118,6 +111,7 @@ Section "InputClass"
         Option "XkbVariant" "dvorak"
 EndSection
 EOF
+
 
 mkdir -p /etc/skel/.config/
 cat > /etc/skel/.config/kxkbrc <<EOF
@@ -132,15 +126,35 @@ EOF
 
 ln -s ../usr/share/zoneinfo/America/New_York /etc/localtime
 
+cat > /etc/locale.conf <<EOF
+LANG="en_US.UTF-8"
+EOF
 
 ### Systemd optimizations
 
-#systemctl disable NetworkManager-wait-online.service
-#mkdir -p /etc/systemd/journald.conf.d
-#cat >/etc/systemd/journald.conf.d/01-limit-size.conf <<EOF
-#SystemMaxUse=50M
-#EOF
+systemctl disable NetworkManager-wait-online.service
+cat >/usr/lib/systemd/journald.conf.d/01-limit-size.conf <<EOF
+[Journal]
+SystemMaxUse=50M
+EOF
 
+### That damn light
+
+cat >/usr/lib/systemd/system/disable-light.service <<EOF
+[Unit]
+Description=Turn off framework power light
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ectool led power off
+
+[Install]
+WantedBy=default.target
+EOF
+
+cat >>/usr/lib/systemd/system-preset/50-hackberry.preset <<EOF
+enable disable-light.service
+EOF
 
 ### Install per-user setup
 
@@ -165,13 +179,3 @@ EOF
 
 cp /ctx/bootstrap_user.sh /usr/bin/bootstrap-user
 chmod +x /usr/bin/bootstrap-user
-
-# Now. A horrible, horrible hack.
-# I can't seem to make systemd enable presets properly. So we need to call this
-# once a user logs in for the firstt time to get everything set up. So we put it
-# in the default .bashrc and let the dotfile installation script overwrite it
-# later.
-
-cat >> /etc/skel/.bashrc <<EOF
-systemctl --user preset bootstrap-user.service
-EOF

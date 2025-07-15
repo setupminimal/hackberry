@@ -14,10 +14,6 @@ reboot --eject
 
 %post
 bootc switch --mutate-in-place --transport registry ghcr.io/setupminimal/hackberry:latest
-
-systemctl preset-all
-systemctl preset-all --user
-sudo -u testuser systemctl preset-all --user
 %end
 """
 
