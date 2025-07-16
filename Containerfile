@@ -34,7 +34,7 @@ RUN dnf -y copr enable tulilirockz/fw-fanctrl && \
     shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses \
     ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
     aspell ImageMagick dnf-plugins-core wget cmake direnv marked fw-ectool sway \
-    tailscale podman podman-compose \
+    tailscale podman podman-compose waydroid \
     # For testing in VMs
     spice-webdavd spice-vdagent && \
     dnf -y clean all
