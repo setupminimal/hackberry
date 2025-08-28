@@ -80,7 +80,6 @@ build $target_image=image_name $tag=default_tag:
     ver="${tag}-${fedora_version}.$(date +%Y%m%d)"
 
     BUILD_ARGS=()
-    BUILD_ARGS+=("--build-arg" "MAJOR_VERSION=${fedora_version}")
     BUILD_ARGS+=("--build-arg" "IMAGE_NAME=${target_image}")
     BUILD_ARGS+=("--build-arg" "IMAGE_VENDOR=${repo_organization}")
     if [[ -z "$(git status -s)" ]]; then

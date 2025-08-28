@@ -26,15 +26,16 @@ ARG FEDORA_MAJOR_VERSION="42"
 ## the following RUN directive does all the things required to run "build.sh" as recommended.
 
 # In separate RUN statement so that it ends up cached in a separate layer
-RUN dnf -y copr enable tulilirockz/fw-fanctrl && \
-    dnf install -y feh mpv strace python3-devel htop calibre evince clang \
+RUN dnf -y copr enable tulilirockz/fw-fanctrl && dnf -y copr enable gmaglione/podman-bootc
+
+RUN dnf install -y feh mpv strace python3-devel htop calibre evince clang \
     emacs g++ gnome-boxes rustup virtualenv flex bison ruby rust rust-src \
     bindgen-cli rustfmt clippy elfutils-libelf-devel ripgrep jq editorconfig \
     npm idris julia fd-find zig racket sbcl black python3-isort python3-pytest \
     shellcheck shfmt clang-tools-extra gcc gcc-c++ gmp gmp-devel make ncurses \
     ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
     aspell ImageMagick dnf-plugins-core wget cmake direnv marked fw-ectool sway \
-    tailscale podman podman-compose waydroid \
+    tailscale podman podman-compose waydroid podman-bootc \
     # For testing in VMs
     spice-webdavd spice-vdagent && \
     dnf -y clean all
