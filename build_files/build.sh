@@ -39,6 +39,8 @@ echo "IMAGE_ID=\"${IMAGE_NAME}\"" >>/usr/lib/os-release
 echo "IMAGE_VERSION=\"${VERSION}\"" >>/usr/lib/os-release
 
 
+mkdir /nix
+
 
 ### Install packages
 

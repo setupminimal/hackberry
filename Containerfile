@@ -36,6 +36,7 @@ RUN dnf install -y feh mpv strace python3-devel htop calibre evince clang \
     ncurses-compat-libs xz perl pkg-config tidy rbenv firefox claws-mail btrbk \
     aspell ImageMagick dnf-plugins-core wget cmake direnv marked fw-ectool sway \
     tailscale podman podman-compose waydroid podman-bootc davfs2 nmap-ncat qt \
+    perf \
     # For testing in VMs
     spice-webdavd spice-vdagent && \
     dnf -y clean all
