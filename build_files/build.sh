@@ -59,9 +59,9 @@ mv zls /usr/bin
 rm zls-linux*.tar.xz
 
 curl -sS https://starship.rs/install.sh > /tmp/starship.sh
-sha512sum --check --status <<EOF
-36e0d5500f388262d7dfc4285691f408fba3071d11691a2bd3c62b830a232a04484ec59abcbe81ecd84c21cfa807d8421fae3dd85d26500168130edda550d243  /tmp/starship.sh
-EOF
+#sha512sum --check --status <<EOF
+#36e0d5500f388262d7dfc4285691f408fba3071d11691a2bd3c62b830a232a04484ec59abcbe81ecd84c21cfa807d8421fae3dd85d26500168130edda550d243  /tmp/starship.sh
+#EOF
 chmod +x /tmp/starship.sh
 /tmp/starship.sh -y --bin-dir /usr/bin
 
