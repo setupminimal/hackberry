@@ -4,7 +4,7 @@ COPY build_files /
 
 # Base Image
 # FROM ghcr.io/ublue-os/aurora-dx:latest
-FROM ghcr.io/ublue-os/kinoite-main:42
+FROM ghcr.io/ublue-os/kinoite-main:43
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
@@ -20,7 +20,7 @@ ARG IMAGE_NAME="hackberry"
 ARG IMAGE_VENDOR="setupminimal"
 ARG UBLUE_IMAGE_TAG="latest"
 ARG BASE_IMAGE_NAME="kinoite"
-ARG FEDORA_MAJOR_VERSION="42"
+ARG FEDORA_MAJOR_VERSION="43"
 
 ### MODIFICATIONS
 ## the following RUN directive does all the things required to run "build.sh" as recommended.
