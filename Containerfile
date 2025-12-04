@@ -26,7 +26,7 @@ ARG FEDORA_MAJOR_VERSION="43"
 ## the following RUN directive does all the things required to run "build.sh" as recommended.
 
 # In separate RUN statement so that it ends up cached in a separate layer
-RUN dnf -y copr enable tulilirockz/fw-fanctrl
+RUN dnf -y copr enable rowanfr/fw-ectool
 
 RUN dnf install -y feh mpv strace python3-devel htop calibre evince clang \
     emacs g++ gnome-boxes rustup virtualenv flex bison ruby rust rust-src \
